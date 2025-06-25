@@ -1,56 +1,46 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  name: { 
-    type: String, 
+  name: {
+    type: String,
     required: true,
     trim: true,
     maxlength: 100
   },
-  email: { 
-    type: String, 
-    required: true, 
+  email: {
+    type: String,
+    required: true,
     unique: true,
     lowercase: true,
     trim: true,
-    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email'],
+    match: [/^[a-zA-Z0-9._%+-]+@vnit\.ac\.in$/, 'Please enter a valid VNIT email'],
     index: true
   },
-  passwordHash: { 
-    type: String, 
+  passwordHash: {
+    type: String,
     required: true
   },
-  role: { 
-    type: String, 
-    enum: ['student', 'admin'], 
+  role: {
+    type: String,
+    enum: ['student', 'admin'],
     required: true,
     index: true
   },
-  rollNumber: { 
+  rollNumber: {
     type: String,
-    required: function() {
-      return this.role === 'student';
-    },
-    unique: true,
-    sparse: true,
-    trim: true,
-    uppercase: true,
-    index: true
+    required: function () { return this.role === 'student'; },
+    match: [/^BT\d{2}[A-Z]{3}\d{3}$/, 'Invalid roll number format. Use format like BT20MEC001'],
+    unique: true
   },
-  adminId: { 
+  adminId: {
     type: String,
-    required: function() {
-      return this.role === 'admin';
-    },
-    unique: true,
-    sparse: true,
-    trim: true,
-    uppercase: true,
-    index: true
+    enum: ['GTVNIT001', 'GTVNIT002', 'GTVNIT003', 'GTVNIT004', 'GTVNIT005'],
+    required: function () { return this.role === 'admin'; },
+    unique: true
   },
-  idCardImageURL: { 
+  idCardImageURL: {
     type: String,
-    required: function() {
+    required: function () {
       return this.role === 'student';
     }
   },
@@ -66,7 +56,7 @@ const userSchema = new mongoose.Schema({
 });
 
 // Pre-save middleware to ensure role-specific validations
-userSchema.pre('save', function(next) {
+userSchema.pre('save', function (next) {
   if (this.role === 'student') {
     if (!this.rollNumber) {
       return next(new Error('Roll number is required for students'));
@@ -83,14 +73,14 @@ userSchema.pre('save', function(next) {
 });
 
 // Method to get public profile (without sensitive data)
-userSchema.methods.getPublicProfile = function() {
+userSchema.methods.getPublicProfile = function () {
   const userObject = this.toObject();
   delete userObject.passwordHash;
   return userObject;
 };
 
 // Static method to find user by email or roll number
-userSchema.statics.findByEmailOrRoll = function(identifier) {
+userSchema.statics.findByEmailOrRoll = function (identifier) {
   return this.findOne({
     $or: [
       { email: identifier.toLowerCase() },
