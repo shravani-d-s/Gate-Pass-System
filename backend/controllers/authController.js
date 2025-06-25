@@ -12,7 +12,11 @@ exports.registerStudent = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+<<<<<<< HEAD
     // Enforce @vnit.ac.in domain
+=======
+    // Enforce @students.vnit.ac.in domain
+>>>>>>> a7ed17bb70a396abf033fad47e8bab2b4ad42562
     if (!/^[a-zA-Z0-9._%+-]+@vnit\.ac\.in$/.test(email)) {
       return res.status(400).json({ message: "Please use your VNIT email (@vnit.ac.in)" });
     }
