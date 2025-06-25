@@ -21,7 +21,7 @@ A full-stack Gate Pass System built using the **MERN stack (MongoDB, Express.js,
 
 | Layer        | Technology           |
 |--------------|----------------------|
-| Frontend     | React.js, Tailwind CSS |
+| Frontend     | React.js             |
 | Backend      | Node.js, Express.js  |
 | Database     | MongoDB, Mongoose    |
 | Auth         | JWT, bcryptjs        |
