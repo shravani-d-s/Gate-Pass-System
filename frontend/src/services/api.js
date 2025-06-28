@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with base configuration
 const API = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
+  baseURL: process.env.REACT_APP_API_URL || 'https://gatepass-system-j7qo.onrender.com',
   timeout: 10000, // 10 second timeout
   headers: {
     'Content-Type': 'application/json',
