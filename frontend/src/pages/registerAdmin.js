@@ -19,7 +19,7 @@ const RegisterAdmin = () => {
     setLoading(true);
 
     try {
-      await API.post('/auth/register-admin', form);
+      await API.post('/api/auth/register-admin', form);
       alert("Admin registered successfully! Please login.");
       navigate('/login');
     } catch (err) {

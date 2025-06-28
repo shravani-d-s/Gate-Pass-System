@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import API from '../services/api';
 
 const RegisterStudent = () => {
-  const [form, setForm] = useState({ 
-    name: '', 
-    email: '', 
-    password: '', 
-    rollNumber: '', 
-    idCardImage: null 
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    rollNumber: '',
+    idCardImage: null
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -33,7 +33,7 @@ const RegisterStudent = () => {
     });
 
     try {
-      await API.post('/auth/register-student', data, {
+      await API.post('/api/auth/register-student', data, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -51,51 +51,51 @@ const RegisterStudent = () => {
     <div className="auth-container">
       <form onSubmit={handleSubmit} className="auth-form">
         <h2>Register as Student</h2>
-        <input 
-          name="name" 
-          placeholder="Full Name" 
+        <input
+          name="name"
+          placeholder="Full Name"
           value={form.name}
-          onChange={handleChange} 
-          required 
+          onChange={handleChange}
+          required
         />
-        <input 
-          name="email" 
+        <input
+          name="email"
           type="email"
-          placeholder="Email" 
+          placeholder="Email"
           value={form.email}
-          onChange={handleChange} 
-          required 
+          onChange={handleChange}
+          required
         />
-        <input 
-          name="password" 
-          type="password" 
-          placeholder="Password" 
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
           value={form.password}
-          onChange={handleChange} 
-          required 
+          onChange={handleChange}
+          required
         />
-        <input 
-          name="rollNumber" 
-          placeholder="Roll Number" 
+        <input
+          name="rollNumber"
+          placeholder="Roll Number"
           value={form.rollNumber}
-          onChange={handleChange} 
-          required 
+          onChange={handleChange}
+          required
         />
         <div className="file-input-container">
           <label htmlFor="idCardImage">Upload ID Card Image:</label>
-          <input 
+          <input
             id="idCardImage"
-            name="idCardImage" 
-            type="file" 
-            accept="image/*" 
-            onChange={handleChange} 
-            required 
+            name="idCardImage"
+            type="file"
+            accept="image/*"
+            onChange={handleChange}
+            required
           />
         </div>
         <button type="submit" disabled={loading}>
           {loading ? 'Registering...' : 'Register'}
         </button>
-        
+
         <div className="auth-links">
           <p>Already have an account?</p>
           <button type="button" onClick={() => navigate('/login')}>
