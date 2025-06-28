@@ -48,3 +48,11 @@ A full-stack Gate Pass System built using the **MERN stack (MongoDB, Express.js,
 | GET       | /api/gatepass/list	   | List all gate passes (guard only)|
 
 ---
+
+##  Improvements
+
+1. Host the project on a good paid platform.
+2. Improve the User Interface.
+3. Verifying Image to be implemented using a Vnit specific id detector.
+
+---
