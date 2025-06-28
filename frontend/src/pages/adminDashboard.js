@@ -18,7 +18,7 @@ const AdminDashboard = () => {
   const fetchPendingRequests = async () => {
     setLoading(true);
     try {
-      const res = await API.get('/api/gatepass/pending');
+      const res = await API.get('/gatepass/pending');
       setPendingRequests(res.data);
     } catch (err) {
       console.error('Failed to fetch pending requests', err);
