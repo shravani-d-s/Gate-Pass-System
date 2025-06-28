@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import API from '../services/api';
+import API from '../services';
 
 const Login = () => {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -12,7 +12,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       const res = await API.post('/api/auth/login', form);
       localStorage.setItem('token', res.data.token);
@@ -34,26 +34,26 @@ const Login = () => {
     <div className="auth-container">
       <form onSubmit={handleSubmit} className="auth-form">
         <h2>Login</h2>
-        <input 
-          name="email" 
+        <input
+          name="email"
           type="email"
-          placeholder="Email" 
+          placeholder="Email"
           value={form.email}
-          onChange={handleChange} 
-          required 
+          onChange={handleChange}
+          required
         />
-        <input 
-          name="password" 
-          type="password" 
-          placeholder="Password" 
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
           value={form.password}
-          onChange={handleChange} 
-          required 
+          onChange={handleChange}
+          required
         />
         <button type="submit" disabled={loading}>
           {loading ? 'Logging in...' : 'Login'}
         </button>
-        
+
         <div className="auth-links">
           <p>Don't have an account?</p>
           <button type="button" onClick={() => navigate('/register-student')}>
