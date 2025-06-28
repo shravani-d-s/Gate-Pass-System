@@ -21,7 +21,7 @@ const StudentDashboard = () => {
 
   const fetchMyRequests = async () => {
     try {
-      const res = await API.get('/gatepass/my-requests');
+      const res = await API.get('/api/gatepass/my-requests');
       setMyRequests(res.data);
     } catch (err) {
       console.error("Failed to fetch requests", err);
@@ -43,7 +43,7 @@ const StudentDashboard = () => {
     setLoading(true);
 
     try {
-      await API.post('/gatepass/create', form);
+      await API.post('/api/gatepass/create', form);
       alert("Gate pass request submitted successfully!");
       setForm({ reason: '', luggageDetails: '' });
       

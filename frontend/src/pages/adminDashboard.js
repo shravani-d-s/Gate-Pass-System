@@ -18,7 +18,7 @@ const AdminDashboard = () => {
   const fetchPendingRequests = async () => {
     setLoading(true);
     try {
-      const res = await API.get('/gatepass/pending');
+      const res = await API.get('/api/gatepass/pending');
       setPendingRequests(res.data);
     } catch (err) {
       console.error('Failed to fetch pending requests', err);
@@ -35,7 +35,7 @@ const AdminDashboard = () => {
 
   const handleApprove = async (id) => {
     try {
-      await API.post(`/gatepass/approve/${id}`);
+      await API.post(`/api/gatepass/approve/${id}`);
       alert('Gate pass approved successfully!');
       // Remove the handled request from UI
       setPendingRequests(pendingRequests.filter(req => req._id !== id));
@@ -46,7 +46,7 @@ const AdminDashboard = () => {
 
   const handleReject = async (id) => {
     try {
-      await API.post(`/gatepass/reject/${id}`);
+      await API.post(`/api/gatepass/reject/${id}`);
       alert('Gate pass rejected successfully!');
       // Remove the handled request from UI
       setPendingRequests(pendingRequests.filter(req => req._id !== id));

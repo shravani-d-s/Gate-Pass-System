@@ -33,7 +33,7 @@ const RegisterStudent = () => {
     });
 
     try {
-      await API.post('/auth/register-student', data, {
+      await API.post('/api/auth/register-student', data, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
