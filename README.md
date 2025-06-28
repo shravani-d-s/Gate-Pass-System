@@ -6,8 +6,8 @@ A full-stack Gate Pass System built using the **MERN stack (MongoDB, Express.js,
 
 ##  Features
 
--  Student registration and login with ID card image upload
--  Guard login using college-issued ID number
+-  Student registration with ID card image upload and login with email(vnit email only)
+-  Guard login using college-issued ID number(use GTVNIT001-GTVNIT005 for trial)
 -  Gate pass request and status tracking
 -  Gate pass verification by guards
 -  File uploads handled using Multer
@@ -27,38 +27,7 @@ A full-stack Gate Pass System built using the **MERN stack (MongoDB, Express.js,
 | Auth         | JWT, bcryptjs        |
 | File Upload  | Multer               |
 | Others       | dotenv, cors         |
-
----
-
-##  Getting Started
-
-### Backend Setup
-
-```bash
-cd gate-pass-system/backend
-npm install
-```
-
-### Environment variables
-
-Create .env in backend/
-- MONGO_URI=your_mongodb_connection_string
-- PORT=5000
-- JWT_SECRET=your_jwt_secret
-
-
-```bash
-npm run dev
-```
-
-### Frontend Setup
-
-```bash
-cd gate-pass-system/frontend
-npm install
-npm start
-```
-The frontend will run on http://localhost:3000
+| Deployment   | Atlas, Render, Vercel|
 
  ---
 
@@ -76,23 +45,14 @@ The frontend will run on http://localhost:3000
 | Method    | Endpoint              | Description                      |
 |-----------|-----------------------|----------------------------------|
 | POST      | /api/gatepass/request | Create a gate pass               |
-| GET       | /api/gatepass/list	  | List all gate passes (guard only)|
+| GET       | /api/gatepass/list	   | List all gate passes (guard only)|
 
 ---
 
-## Screenshots
+##  Improvements
 
-### Login page
-
-![image](https://github.com/user-attachments/assets/d6f7451e-a4ec-441a-8a3c-2b1fadded2a0)
-
-### Student Dashboard
-
-![image](https://github.com/user-attachments/assets/646a0178-e845-47bf-af58-cfed3dbde107)
-![image](https://github.com/user-attachments/assets/84413920-6a58-48ea-bfa4-ccb061611cce)
-
-### Admin Dashboard
-
-![image](https://github.com/user-attachments/assets/7c3d47a4-b631-403e-94ae-ba432aa66afe)
+1. Host the project on a good paid platform.
+2. Improve the User Interface.
+3. Verifying Image to be implemented using a Vnit specific id detector.
 
 ---
