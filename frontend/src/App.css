@@ -37,31 +37,22 @@ body {
 }
 
 /* Auth Page */
-.auth-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 20px;
-}
-
 .auth-form {
   background: var(--secondary-bg);
-  border: 1px solid var(--glass-border);
-  padding: 3rem;
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
-  max-width: 420px;
+  padding: 2.5rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  max-width: 400px;
   width: 100%;
-  transition: var(--transition);
+  border: 1px solid var(--glass-border);
 }
 
 .auth-form h2 {
-  text-align: center;
-  margin-bottom: 2rem;
+  font-size: 2rem;
+  font-weight: 700;
   color: var(--primary-text);
-  font-size: 1.8rem;
-  font-weight: 600;
+  text-align: center;
+  margin-bottom: 1.5rem;
 }
 
 .auth-form input {
@@ -71,16 +62,14 @@ body {
   border: 1px solid #30363d;
   border-radius: 8px;
   color: var(--primary-text);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  transition: border 0.3s ease;
 }
 
 .auth-form input:focus {
-  outline: none;
   border-color: var(--accent);
-}
-
-.auth-form input::placeholder {
-  color: var(--secondary-text);
+  outline: none;
 }
 
 .auth-form button {
@@ -92,12 +81,44 @@ body {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: var(--transition);
+  font-size: 1rem;
+  transition: background 0.3s ease, transform 0.2s ease;
 }
 
 .auth-form button:hover {
   background: var(--accent-hover);
+  transform: translateY(-1px);
 }
+
+.auth-links {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.auth-links p {
+  margin-bottom: 0.75rem;
+  color: var(--secondary-text);
+}
+
+.auth-links .link-btn {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 5px 0;
+  display: block;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.auth-links .link-btn:hover {
+  background: var(--accent);
+  color: white;
+}
+
 
 /* Dashboard */
 .dashboard-container {
@@ -160,7 +181,7 @@ body {
   height: 40px;
   width: auto;
   object-fit: contain;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 /* Dashboard Content */
@@ -253,7 +274,7 @@ body {
 
 .request-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .request-header {
