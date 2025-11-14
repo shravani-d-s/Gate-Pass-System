@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../services/api';
 
@@ -10,12 +10,8 @@ const AdminDashboard = () => {
   // Get user info from localStorage
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-  // Fetch all pending gate pass requests
-  useEffect(() => {
-    fetchPendingRequests();
-  }, []);
-
-  const fetchPendingRequests = async () => {
+  // FIX: Wrap function in useCallback so it can be added to dependency array
+  const fetchPendingRequests = useCallback(async () => {
     setLoading(true);
     try {
       const res = await API.get('/api/gatepass/pending');
@@ -23,7 +19,6 @@ const AdminDashboard = () => {
     } catch (err) {
       console.error('Failed to fetch pending requests', err);
       if (err.response?.status === 401) {
-        // Token expired or invalid
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         navigate('/login');
@@ -31,13 +26,17 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
+
+  // Now add it to dependency array safely
+  useEffect(() => {
+    fetchPendingRequests();
+  }, [fetchPendingRequests]);
 
   const handleApprove = async (id) => {
     try {
       await API.post(`/api/gatepass/approve/${id}`);
       alert('Gate pass approved successfully!');
-      // Remove the handled request from UI
       setPendingRequests(pendingRequests.filter(req => req._id !== id));
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to approve gate pass');
@@ -48,7 +47,6 @@ const AdminDashboard = () => {
     try {
       await API.post(`/api/gatepass/reject/${id}`);
       alert('Gate pass rejected successfully!');
-      // Remove the handled request from UI
       setPendingRequests(pendingRequests.filter(req => req._id !== id));
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to reject gate pass');

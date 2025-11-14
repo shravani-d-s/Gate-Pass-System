@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../services/api';
 
@@ -14,25 +14,24 @@ const StudentDashboard = () => {
   // Get user info from localStorage
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-  // Fetch student's previous requests
-  useEffect(() => {
-    fetchMyRequests();
-  }, []);
-
-  const fetchMyRequests = async () => {
+  // Fetch student's previous requests (wrapped in useCallback)
+  const fetchMyRequests = useCallback(async () => {
     try {
       const res = await API.get('/api/gatepass/my-requests');
       setMyRequests(res.data);
     } catch (err) {
       console.error("Failed to fetch requests", err);
       if (err.response?.status === 401) {
-        // Token expired or invalid
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         navigate('/login');
       }
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    fetchMyRequests();
+  }, [fetchMyRequests]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -46,8 +45,7 @@ const StudentDashboard = () => {
       await API.post('/api/gatepass/create', form);
       alert("Gate pass request submitted successfully!");
       setForm({ reason: '', luggageDetails: '' });
-      
-      // Re-fetch updated requests
+
       await fetchMyRequests();
     } catch (err) {
       alert(err.response?.data?.message || "Request failed");
@@ -107,20 +105,20 @@ const StudentDashboard = () => {
                 rows="3"
               />
             </div>
-            
+
             <div className="form-group">
               <label htmlFor="luggageDetails">Luggage Details:</label>
               <textarea
                 id="luggageDetails"
                 name="luggageDetails"
-                placeholder="Describe any luggage you're carrying (e.g., laptop bag, books, etc.)"
+                placeholder="Describe any luggage you're carrying"
                 value={form.luggageDetails}
                 onChange={handleChange}
                 required
                 rows="2"
               />
             </div>
-            
+
             <button type="submit" disabled={loading} className="submit-btn">
               {loading ? 'Submitting...' : 'Submit Request'}
             </button>
