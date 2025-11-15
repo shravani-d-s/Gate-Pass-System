@@ -4,36 +4,50 @@ const User = require('../models/users');
 // Student creates a gate pass request
 exports.createGatePass = async (req, res) => {
   try {
-    const { reason, luggageDetails, exitDate } = req.body;
+    console.log("📥 Backend received:", req.body);
+
+    const {
+      name,
+      hostelBlock,
+      journeyDate,
+      leavingTime,
+      destination,
+      reason,
+      luggageDetails
+    } = req.body;
+
     const studentId = req.user.userId;
 
-    // Validate required fields
-    if (!reason || !luggageDetails) {
-      return res.status(400).json({ message: "Reason and luggage details are required" });
+    if (!name || !hostelBlock || !journeyDate || !leavingTime || !destination || !reason || !luggageDetails) {
+      return res.status(400).json({ message: "All fields are required" });
     }
 
-    const newPass = new GatePass({ 
-      studentId, 
-      reason, 
+    const newPass = await GatePass.create({
+      studentId,
+      name,
+      hostelBlock,
+      journeyDate,
+      leavingTime,
+      destination,
+      reason,
       luggageDetails,
-      exitDate: exitDate || new Date()
+      requestDate: new Date()
     });
-    
-    await newPass.save();
 
-    // Populate student details for response
     const populatedPass = await GatePass.findById(newPass._id)
       .populate('studentId', 'name rollNumber');
 
-    res.status(201).json({ 
-      message: "Gate pass requested successfully", 
-      gatePass: populatedPass 
+    res.status(201).json({
+      message: "Gate pass requested successfully",
+      gatePass: populatedPass
     });
+
   } catch (err) {
     console.error('Create gate pass error:', err);
     res.status(500).json({ message: err.message });
   }
 };
+
 
 // Student views their gate pass requests
 exports.getMyGatePasses = async (req, res) => {
@@ -55,12 +69,12 @@ exports.getAllGatePasses = async (req, res) => {
   try {
     const { status } = req.query;
     const filter = status ? { status } : {};
-    
+
     const passes = await GatePass.find(filter)
       .populate('studentId', 'name rollNumber email')
       .populate('approvedBy', 'name')
       .sort({ requestDate: -1 });
-      
+
     res.status(200).json(passes);
   } catch (err) {
     console.error('Get all gate passes error:', err);
@@ -74,7 +88,7 @@ exports.getPendingGatePasses = async (req, res) => {
     const pending = await GatePass.find({ status: 'pending' })
       .populate('studentId', 'name rollNumber email')
       .sort({ requestDate: -1 });
-      
+
     res.status(200).json(pending);
   } catch (err) {
     console.error('Get pending gate passes error:', err);
@@ -102,12 +116,12 @@ exports.approvePass = async (req, res) => {
       approvedBy,
       approvedDate: new Date()
     }, { new: true })
-    .populate('studentId', 'name rollNumber email')
-    .populate('approvedBy', 'name');
+      .populate('studentId', 'name rollNumber email')
+      .populate('approvedBy', 'name');
 
-    res.status(200).json({ 
-      message: "Gate pass approved successfully", 
-      gatePass: updated 
+    res.status(200).json({
+      message: "Gate pass approved successfully",
+      gatePass: updated
     });
   } catch (err) {
     console.error('Approve gate pass error:', err);
@@ -137,12 +151,12 @@ exports.rejectPass = async (req, res) => {
       rejectionReason,
       approvedDate: new Date()
     }, { new: true })
-    .populate('studentId', 'name rollNumber email')
-    .populate('approvedBy', 'name');
+      .populate('studentId', 'name rollNumber email')
+      .populate('approvedBy', 'name');
 
-    res.status(200).json({ 
-      message: "Gate pass rejected successfully", 
-      gatePass: updated 
+    res.status(200).json({
+      message: "Gate pass rejected successfully",
+      gatePass: updated
     });
   } catch (err) {
     console.error('Reject gate pass error:', err);

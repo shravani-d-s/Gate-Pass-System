@@ -7,17 +7,14 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Get user info from localStorage
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-  // FIX: Wrap function in useCallback so it can be added to dependency array
   const fetchPendingRequests = useCallback(async () => {
     setLoading(true);
     try {
       const res = await API.get('/api/gatepass/pending');
       setPendingRequests(res.data);
     } catch (err) {
-      console.error('Failed to fetch pending requests', err);
       if (err.response?.status === 401) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
@@ -28,7 +25,6 @@ const AdminDashboard = () => {
     }
   }, [navigate]);
 
-  // Now add it to dependency array safely
   useEffect(() => {
     fetchPendingRequests();
   }, [fetchPendingRequests]);
@@ -82,7 +78,7 @@ const AdminDashboard = () => {
       <div className="dashboard-content">
         <section className="pending-section">
           <h2>Pending Gate Pass Requests ({pendingRequests.length})</h2>
-          
+
           {loading ? (
             <p>Loading requests...</p>
           ) : pendingRequests.length === 0 ? (
@@ -93,6 +89,7 @@ const AdminDashboard = () => {
             <div className="requests-grid">
               {pendingRequests.map((req) => (
                 <div key={req._id} className="request-card pending">
+
                   <div className="request-header">
                     <div className="student-info">
                       <h3>{req.studentId?.name || 'Unknown Student'}</h3>
@@ -102,32 +99,55 @@ const AdminDashboard = () => {
                       <small>{formatDate(req.requestDate)}</small>
                     </div>
                   </div>
-                  
+
                   <div className="request-details">
+
                     <div className="detail-group">
-                      <label>Reason:</label>
-                      <p>{req.reason}</p>
+                      <label>Name:</label>
+                      <p>{req.name}</p>
                     </div>
+
+                    <div className="detail-group">
+                      <label>Hostel Block:</label>
+                      <p>{req.hostelBlock}</p>
+                    </div>
+
+                    <div className="detail-group">
+                      <label>Date of Journey:</label>
+                      <p>{req.journeyDate}</p>
+                    </div>
+
+                    <div className="detail-group">
+                      <label>Time of Leaving:</label>
+                      <p>{req.leavingTime}</p>
+                    </div>
+
+                    <div className="detail-group">
+                      <label>Destination:</label>
+                      <p>{req.destination}</p>
+                    </div>
+
                     <div className="detail-group">
                       <label>Luggage Details:</label>
                       <p>{req.luggageDetails}</p>
                     </div>
+
+                    <div className="detail-group">
+                      <label>Reason:</label>
+                      <p>{req.reason}</p>
+                    </div>
+
                   </div>
-                  
+
                   <div className="action-buttons">
-                    <button 
-                      onClick={() => handleApprove(req._id)}
-                      className="approve-btn"
-                    >
+                    <button onClick={() => handleApprove(req._id)} className="approve-btn">
                       Approve
                     </button>
-                    <button 
-                      onClick={() => handleReject(req._id)}
-                      className="reject-btn"
-                    >
+                    <button onClick={() => handleReject(req._id)} className="reject-btn">
                       Reject
                     </button>
                   </div>
+
                 </div>
               ))}
             </div>
