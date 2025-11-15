@@ -102,39 +102,32 @@ const AdminDashboard = () => {
 
                   <div className="request-details">
 
-                    <div className="detail-group">
-                      <label>Name:</label>
-                      <p>{req.name}</p>
+                    <div className="detail-row">
+                      <strong>Name:</strong> {req.name}
                     </div>
 
-                    <div className="detail-group">
-                      <label>Hostel Block:</label>
-                      <p>{req.hostelBlock}</p>
+                    <div className="detail-row">
+                      <strong>Hostel Block:</strong> {req.hostelBlock}
                     </div>
 
-                    <div className="detail-group">
-                      <label>Date of Journey:</label>
-                      <p>{req.journeyDate}</p>
+                    <div className="detail-row">
+                      <strong>Date of Journey:</strong> {req.journeyDate}
                     </div>
 
-                    <div className="detail-group">
-                      <label>Time of Leaving:</label>
-                      <p>{req.leavingTime}</p>
+                    <div className="detail-row">
+                      <strong>Time of Leaving:</strong> {req.leavingTime}
                     </div>
 
-                    <div className="detail-group">
-                      <label>Destination:</label>
-                      <p>{req.destination}</p>
+                    <div className="detail-row">
+                      <strong>Destination:</strong> {req.destination}
                     </div>
 
-                    <div className="detail-group">
-                      <label>Luggage Details:</label>
-                      <p>{req.luggageDetails}</p>
+                    <div className="detail-row">
+                      <strong>Luggage Details:</strong> {req.luggageDetails}
                     </div>
 
-                    <div className="detail-group">
-                      <label>Reason:</label>
-                      <p>{req.reason}</p>
+                    <div className="detail-row">
+                      <strong>Reason:</strong> {req.reason}
                     </div>
 
                   </div>
