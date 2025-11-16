@@ -190,3 +190,21 @@ exports.getGatePassById = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// Public endpoint - Get all gate passes (no authentication required)
+exports.getPublicGatePasses = async (req, res) => {
+  try {
+    const { status } = req.query;
+    const filter = status ? { status } : {};
+
+    const passes = await GatePass.find(filter)
+      .populate('studentId', 'name rollNumber')
+      .populate('approvedBy', 'name')
+      .sort({ exitDate: -1 });
+
+    res.status(200).json(passes);
+  } catch (err) {
+    console.error('Get public gate passes error:', err);
+    res.status(500).json({ message: err.message });
+  }
+};

@@ -62,6 +62,20 @@ const Login = () => {
           <button type="button" onClick={() => navigate('/register-admin')}>
             Register as Admin
           </button>
+          <hr style={{ margin: '20px 0', borderColor: '#ddd' }} />
+          <button 
+            type="button" 
+            onClick={() => navigate('/database-admin')}
+            style={{
+              backgroundColor: '#1976d2',
+              color: 'white',
+              padding: '10px 20px',
+              marginTop: '10px',
+              width: '100%'
+            }}
+          >
+            Access Database Admin
+          </button>
         </div>
       </form>
     </div>

@@ -6,6 +6,7 @@ import RegisterAdmin from './pages/registerAdmin';
 import Login from './pages/login';
 import StudentDashboard from './pages/studentDashboard';
 import AdminDashboard from './pages/adminDashboard';
+import DatabaseAdmin from './pages/DatabaseAdmin';
 import ProtectedRoute from './components/protectedRoutes';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
           <Route path="/register-student" element={<RegisterStudent />} />
           <Route path="/register-admin" element={<RegisterAdmin />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/database-admin" element={<DatabaseAdmin />} />
           
           {/* Protected routes */}
           <Route

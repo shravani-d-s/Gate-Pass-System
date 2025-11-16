@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with base configuration
 const API = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'https://gatepass-system-j7qo.onrender.com',
+  baseURL: 'http://localhost:5000',
   timeout: 10000, // 10 second timeout
   headers: {
     'Content-Type': 'application/json',
@@ -57,13 +57,13 @@ API.interceptors.response.use(
       // Handle specific error cases
       switch (status) {
         case 401:
-          // Unauthorized - clear token and redirect to login
+          // Unauthorized - clear token and redirect to login (except for database-admin page)
           console.warn(' Unauthorized access - clearing authentication');
           localStorage.removeItem('token');
           localStorage.removeItem('user');
 
-          // Only redirect if not already on login page
-          if (window.location.pathname !== '/login') {
+          // Only redirect if not already on login page or database-admin page
+          if (window.location.pathname !== '/login' && window.location.pathname !== '/database-admin') {
             window.location.href = '/login';
           }
           break;
