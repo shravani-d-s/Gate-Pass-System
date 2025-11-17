@@ -607,3 +607,228 @@ select:focus {
   color: #fff;
   margin: 5px 0;
 }
+/* ================================
+   VERIFY PAGE LAYOUT
+================================ */
+
+/* Wrapper that holds back button + card */
+.verify-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;       /* Space between back button & card */
+  margin-top: 30px;
+}
+
+/* Back button on LEFT of the card */
+.verify-side-back-btn {
+  background: linear-gradient(135deg, #4e54c8, #8f94fb);
+  padding: 14px 26px;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(78, 84, 200, 0.35);
+  transition: 0.25s ease;
+  margin-top: 10px;
+}
+
+.verify-side-back-btn:hover {
+  transform: translateY(-3px);
+  opacity: 0.92;
+}
+
+/* Main verify card */
+.verify-card {
+  width: 650px;
+  background: rgba(255, 255, 255, 0.25);
+  padding: 25px 30px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+/* Align checkbox + name neatly */
+.verify-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.verify-name {
+  font-weight: 600;
+  color: #1f2d3d;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.verify-name:hover {
+  color: #445dfc;
+  text-decoration: underline;
+}
+
+/* ========================================
+   MODAL
+======================================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+}
+
+/* Main modal box */
+.vnit-modal {
+  width: 480px;
+  background: #ffffff;
+  padding: 34px;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.20);
+  position: relative;
+  animation: fadeIn 0.3s ease;
+}
+
+/* Modal Title */
+.vnit-modal h2 {
+  text-align: center;
+  font-size: 26px;
+  margin-bottom: 16px;
+  color: #1f2d3d;
+}
+
+/* Top-right X button */
+.modal-close-icon {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 26px;
+  font-weight: 700;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s ease;
+  color: #444;
+}
+
+.modal-close-icon:hover {
+  color: #ff1744;
+  transform: scale(1.12);
+}
+
+/* Details text */
+.modal-details p {
+  margin: 6px 0;
+  font-size: 15px;
+  color: #222;
+}
+
+.vnit-modal h3 {
+  margin-top: 22px;
+  margin-bottom: 10px;
+  font-weight: 700;
+  color: #3f51b5;
+}
+
+/* Inputs */
+.modal-input {
+  width: 100%;
+  margin-top: 10px;
+  padding: 13px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.12);
+  font-size: 15px;
+  background: #fafafa;
+}
+
+/* Save button */
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 26px;
+}
+
+.submit-btn {
+  padding: 14px 30px;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #00c853, #00e676);
+  color: white;
+  font-size: 1.15rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 200, 83, 0.25);
+  transition: 0.2s ease;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+/* Fade animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+/* FIXED Verify Gate Pass Button */
+.verify-btn {
+  padding: 12px 28px;
+  border-radius: 40px;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-right: 12px;
+  box-shadow: 0 8px 20px rgba(80, 90, 210, 0.35);
+  transition: 0.25s ease;
+}
+
+.verify-btn:hover {
+  transform: translateY(-3px);
+  opacity: 0.92;
+}
+
+.gatepass-form button {
+  width: 100%;
+  padding: 12px 0;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #d5c7ff, #b39ddb);
+  color: #333;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  transition: all 0.25s ease-in-out;
+}
+
+/* Hover effect */
+.gatepass-form button:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+  background: linear-gradient(135deg, #c9b7ff, #a78bfa);
+}
+
+/* Disabled State */
+.gatepass-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}

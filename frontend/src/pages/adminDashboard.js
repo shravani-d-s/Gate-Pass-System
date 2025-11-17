@@ -69,11 +69,21 @@ const AdminDashboard = () => {
     <div className="dashboard-container">
       <header className="dashboard-header">
         <h1>Admin Dashboard</h1>
+
         <div className="user-info">
-          <span>Welcome, {user.name}!</span>
-          <button onClick={handleLogout} className="logout-btn">Logout</button>
+          <button
+            onClick={() => navigate('/gatepass-verify')}
+            className="verify-btn"
+          >
+            Verify Gate Pass
+          </button>
+
+          <button onClick={handleLogout} className="logout-btn">
+            Logout
+          </button>
         </div>
       </header>
+
 
       <div className="dashboard-content">
         <section className="pending-section">

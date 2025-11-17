@@ -8,22 +8,21 @@ import StudentDashboard from './pages/studentDashboard';
 import AdminDashboard from './pages/adminDashboard';
 import DatabaseAdmin from './pages/DatabaseAdmin';
 import ProtectedRoute from './components/protectedRoutes';
+import GatePassVerify from './pages/gatePassVerify';   // <-- IMPORTANT
 
 function App() {
   return (
     <Router>
       <div className="App">
         <Routes>
-          {/* Default route redirects to login */}
+
           <Route path="/" element={<Navigate to="/login" replace />} />
-          
-          {/* Authentication routes */}
+
           <Route path="/register-student" element={<RegisterStudent />} />
           <Route path="/register-admin" element={<RegisterAdmin />} />
           <Route path="/login" element={<Login />} />
           <Route path="/database-admin" element={<DatabaseAdmin />} />
-          
-          {/* Protected routes */}
+
           <Route
             path="/student-dashboard"
             element={
@@ -32,6 +31,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/admin-dashboard"
             element={
@@ -40,9 +40,19 @@ function App() {
               </ProtectedRoute>
             }
           />
-          
-          {/* Catch all route */}
+
+          {/* ⭐ NEW ROUTE (Fix) ⭐ */}
+          <Route
+            path="/gatepass-verify"
+            element={
+              <ProtectedRoute role="admin">
+                <GatePassVerify />
+              </ProtectedRoute>
+            }
+          />
+
           <Route path="*" element={<Navigate to="/login" replace />} />
+
         </Routes>
       </div>
     </Router>

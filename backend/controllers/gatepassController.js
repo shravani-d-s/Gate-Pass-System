@@ -1,10 +1,12 @@
-const GatePass = require('../models/gatepass');
-const User = require('../models/users');
+const GatePass = require("../models/gatepass");
+const User = require("../models/users");
 
-// Student creates a gate pass request
+/* ----------------------------------------------------
+   STUDENT: CREATE GATE PASS
+---------------------------------------------------- */
 exports.createGatePass = async (req, res) => {
   try {
-    console.log("📥 Backend received:", req.body);
+    console.log("📥 Backend received GatePass:", req.body);
 
     const {
       name,
@@ -13,13 +15,22 @@ exports.createGatePass = async (req, res) => {
       leavingTime,
       destination,
       reason,
-      luggageDetails
+      luggageDetails,
     } = req.body;
 
     const studentId = req.user.userId;
 
-    if (!name || !hostelBlock || !journeyDate || !leavingTime || !destination || !reason || !luggageDetails) {
-      return res.status(400).json({ message: "All fields are required" });
+    // Validate required fields
+    if (
+      !name ||
+      !hostelBlock ||
+      !journeyDate ||
+      !leavingTime ||
+      !destination ||
+      !reason ||
+      !luggageDetails
+    ) {
+      return res.status(400).json({ message: "All fields are required!" });
     }
 
     const newPass = await GatePass.create({
@@ -31,180 +42,235 @@ exports.createGatePass = async (req, res) => {
       destination,
       reason,
       luggageDetails,
-      requestDate: new Date()
     });
 
-    const populatedPass = await GatePass.findById(newPass._id)
-      .populate('studentId', 'name rollNumber');
+    const populated = await GatePass.findById(newPass._id).populate(
+      "studentId",
+      "name rollNumber"
+    );
 
     res.status(201).json({
       message: "Gate pass requested successfully",
-      gatePass: populatedPass
+      gatePass: populated,
     });
-
   } catch (err) {
-    console.error('Create gate pass error:', err);
+    console.error("CreateGatePass Error:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
-
-// Student views their gate pass requests
+/* ----------------------------------------------------
+   STUDENT: VIEW OWN GATE PASS REQUESTS
+---------------------------------------------------- */
 exports.getMyGatePasses = async (req, res) => {
   try {
     const studentId = req.user.userId;
+
     const passes = await GatePass.find({ studentId })
-      .populate('approvedBy', 'name')
+      .populate("approvedBy", "name")
       .sort({ requestDate: -1 });
 
     res.status(200).json(passes);
   } catch (err) {
-    console.error('Get my gate passes error:', err);
+    console.error("GetMyGatePasses Error:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
-// Admin views all gate pass requests (with optional status filter)
+/* ----------------------------------------------------
+   ADMIN / GUARD: VIEW ALL PASSES (optional filter)
+---------------------------------------------------- */
 exports.getAllGatePasses = async (req, res) => {
   try {
-    const { status } = req.query;
-    const filter = status ? { status } : {};
+    const filter = req.query.status ? { status: req.query.status } : {};
 
     const passes = await GatePass.find(filter)
-      .populate('studentId', 'name rollNumber email')
-      .populate('approvedBy', 'name')
+      .populate("studentId", "name rollNumber email")
+      .populate("approvedBy", "name")
       .sort({ requestDate: -1 });
 
     res.status(200).json(passes);
   } catch (err) {
-    console.error('Get all gate passes error:', err);
+    console.error("GetAllGatePasses Error:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
-// Admin views pending gate pass requests
+/* ----------------------------------------------------
+   ADMIN / GUARD: GET ONLY PENDING REQUESTS
+---------------------------------------------------- */
 exports.getPendingGatePasses = async (req, res) => {
   try {
-    const pending = await GatePass.find({ status: 'pending' })
-      .populate('studentId', 'name rollNumber email')
+    const pending = await GatePass.find({ status: "pending" })
+      .populate("studentId", "name rollNumber email")
       .sort({ requestDate: -1 });
 
     res.status(200).json(pending);
   } catch (err) {
-    console.error('Get pending gate passes error:', err);
+    console.error("GetPendingGatePasses Error:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
-// Admin approves a request
+/* ----------------------------------------------------
+   ADMIN / GUARD: GET ONLY APPROVED PASSES 
+---------------------------------------------------- */
+exports.getApprovedGatePasses = async (req, res) => {
+  try {
+    const passes = await GatePass.find({ status: "approved" })
+      .populate("studentId", "name rollNumber")
+      .sort({ approvedDate: -1 });
+
+    res.status(200).json(passes);
+  } catch (err) {
+    console.error("GetApprovedGatePasses Error:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+/* ----------------------------------------------------
+   ADMIN: APPROVE REQUEST
+---------------------------------------------------- */
 exports.approvePass = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
     const approvedBy = req.user.userId;
 
     const gatePass = await GatePass.findById(id);
-    if (!gatePass) {
-      return res.status(404).json({ message: "Gate pass not found" });
-    }
+    if (!gatePass) return res.status(404).json({ message: "Gate pass not found" });
 
-    if (gatePass.status !== 'pending') {
+    if (gatePass.status !== "pending")
       return res.status(400).json({ message: "Gate pass already processed" });
-    }
 
-    const updated = await GatePass.findByIdAndUpdate(id, {
-      status: 'approved',
-      approvedBy,
-      approvedDate: new Date()
-    }, { new: true })
-      .populate('studentId', 'name rollNumber email')
-      .populate('approvedBy', 'name');
+    const updated = await GatePass.findByIdAndUpdate(
+      id,
+      {
+        status: "approved",
+        approvedBy,
+        approvedDate: new Date(),
+      },
+      { new: true }
+    )
+      .populate("studentId", "name rollNumber email")
+      .populate("approvedBy", "name");
 
     res.status(200).json({
       message: "Gate pass approved successfully",
-      gatePass: updated
+      gatePass: updated,
     });
   } catch (err) {
-    console.error('Approve gate pass error:', err);
+    console.error("ApprovePass Error:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
-// Admin rejects a request
+/* ----------------------------------------------------
+   ADMIN: REJECT REQUEST
+---------------------------------------------------- */
 exports.rejectPass = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
     const { rejectionReason } = req.body;
     const approvedBy = req.user.userId;
 
     const gatePass = await GatePass.findById(id);
-    if (!gatePass) {
-      return res.status(404).json({ message: "Gate pass not found" });
-    }
+    if (!gatePass) return res.status(404).json({ message: "Gate pass not found" });
 
-    if (gatePass.status !== 'pending') {
+    if (gatePass.status !== "pending")
       return res.status(400).json({ message: "Gate pass already processed" });
-    }
 
-    const updated = await GatePass.findByIdAndUpdate(id, {
-      status: 'rejected',
-      approvedBy,
-      rejectionReason,
-      approvedDate: new Date()
-    }, { new: true })
-      .populate('studentId', 'name rollNumber email')
-      .populate('approvedBy', 'name');
+    const updated = await GatePass.findByIdAndUpdate(
+      id,
+      {
+        status: "rejected",
+        approvedBy,
+        rejectionReason,
+        approvedDate: new Date(),
+      },
+      { new: true }
+    )
+      .populate("studentId", "name rollNumber email")
+      .populate("approvedBy", "name");
 
     res.status(200).json({
       message: "Gate pass rejected successfully",
-      gatePass: updated
+      gatePass: updated,
     });
   } catch (err) {
-    console.error('Reject gate pass error:', err);
+    console.error("RejectPass Error:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
-// Get gate pass by ID (for both admin and student)
+/* ----------------------------------------------------
+   ADMIN/STUDENT: GET PASS BY ID
+---------------------------------------------------- */
 exports.getGatePassById = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
     const userId = req.user.userId;
     const userRole = req.user.role;
 
     const gatePass = await GatePass.findById(id)
-      .populate('studentId', 'name rollNumber email')
-      .populate('approvedBy', 'name');
+      .populate("studentId", "name rollNumber email")
+      .populate("approvedBy", "name");
 
-    if (!gatePass) {
-      return res.status(404).json({ message: "Gate pass not found" });
-    }
+    if (!gatePass) return res.status(404).json({ message: "Gate pass not found" });
 
-    // Check if student is requesting their own gate pass or if user is admin
-    if (userRole === 'student' && gatePass.studentId._id.toString() !== userId) {
+    if (userRole === "student" && gatePass.studentId._id.toString() !== userId) {
       return res.status(403).json({ message: "Access denied" });
     }
 
     res.status(200).json(gatePass);
   } catch (err) {
-    console.error('Get gate pass by ID error:', err);
+    console.error("GetGatePassById Error:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
-// Public endpoint - Get all gate passes (no authentication required)
+/* ----------------------------------------------------
+   GUARD (ADMIN): SAVE TRANSPORT DETAILS
+---------------------------------------------------- */
+exports.verifyTransport = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { cabNumber, transportMode, ticketNumber } = req.body;
+
+    const updated = await GatePass.findByIdAndUpdate(
+      id,
+      {
+        cabNumber,
+        transportMode,
+        ticketNumber,
+      },
+      { new: true }
+    );
+
+    if (!updated) return res.status(404).json({ message: "Gate pass not found" });
+
+    res.status(200).json({
+      message: "Transport details saved successfully!",
+      gatePass: updated,
+    });
+  } catch (err) {
+    console.error("VerifyTransport Error:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+/* ----------------------------------------------------
+   PUBLIC: VIEW PASSES (NO AUTH)
+---------------------------------------------------- */
 exports.getPublicGatePasses = async (req, res) => {
   try {
-    const { status } = req.query;
-    const filter = status ? { status } : {};
-
-    const passes = await GatePass.find(filter)
-      .populate('studentId', 'name rollNumber')
-      .populate('approvedBy', 'name')
-      .sort({ exitDate: -1 });
+    const passes = await GatePass.find()
+      .populate("studentId", "name rollNumber")
+      .populate("approvedBy", "name")
+      .sort({ requestDate: -1 });
 
     res.status(200).json(passes);
   } catch (err) {
-    console.error('Get public gate passes error:', err);
+    console.error("PublicGatePass Error:", err);
     res.status(500).json({ message: err.message });
   }
 };
