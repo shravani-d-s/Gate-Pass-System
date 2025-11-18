@@ -17,14 +17,13 @@ const StudentDashboard = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Get user info
+  // Get logged-in user
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-  // Fetch student's previous requests
+  // Fetch student’s previous requests
   const fetchMyRequests = useCallback(async () => {
     try {
       const res = await API.get('/api/gatepass/my-requests');
-      console.log("📥 Received request history:", res.data);
       setMyRequests(res.data);
     } catch (err) {
       console.error("❌ Failed to fetch requests", err);
@@ -40,28 +39,21 @@ const StudentDashboard = () => {
     fetchMyRequests();
   }, [fetchMyRequests]);
 
-  // Handle form input
+  // Form input handler
   const handleChange = (e) => {
-    const updated = { ...form, [e.target.name]: e.target.value };
-    console.log("✏️ Updated form:", updated);
-    setForm(updated);
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Handle submit
+  // Submit new gate pass
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    console.log("🚀 SUBMITTING FORM DATA:", form);
-
     try {
-      const res = await API.post('/api/gatepass/create', form);
-
-      console.log("✅ Backend Response:", res.data);
+      await API.post('/api/gatepass/create', form);
 
       alert("Gate pass request submitted successfully!");
 
-      // Reset form
       setForm({
         name: '',
         hostelBlock: '',
@@ -72,7 +64,7 @@ const StudentDashboard = () => {
         reason: ''
       });
 
-      await fetchMyRequests();
+      fetchMyRequests();
     } catch (err) {
       console.error("❌ ERROR while submitting:", err);
       alert(err.response?.data?.message || "Request failed");
@@ -81,12 +73,14 @@ const StudentDashboard = () => {
     }
   };
 
+  // Logout
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     navigate('/login');
   };
 
+  // Status colors
   const getStatusColor = (status) => {
     switch (status) {
       case 'approved': return '#4CAF50';
@@ -95,6 +89,7 @@ const StudentDashboard = () => {
     }
   };
 
+  // Date formatting
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -103,6 +98,22 @@ const StudentDashboard = () => {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  // 🔵 Student updates transport details AFTER approval
+  const updateTransport = async (id, field, value) => {
+    try {
+      const res = await API.put(`/api/gatepass/student/update-transport/${id}`, {
+        [field]: value,
+      });
+
+      setMyRequests((prev) =>
+        prev.map((p) => (p._id === id ? res.data.gatePass : p))
+      );
+    } catch (err) {
+      console.error("❌ Failed to update transport details:", err);
+      alert("Failed to update transport details");
+    }
   };
 
   return (
@@ -116,6 +127,8 @@ const StudentDashboard = () => {
       </header>
 
       <div className="dashboard-content">
+
+        {/* CREATE NEW REQUEST */}
         <section className="request-section">
           <h2>Request New Gate Pass</h2>
 
@@ -123,23 +136,12 @@ const StudentDashboard = () => {
 
             <div className="form-group">
               <label>Name:</label>
-              <input
-                type="text"
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                required
-              />
+              <input type="text" name="name" value={form.name} onChange={handleChange} required />
             </div>
 
             <div className="form-group">
               <label>Hostel Block:</label>
-              <select
-                name="hostelBlock"
-                value={form.hostelBlock}
-                onChange={handleChange}
-                required
-              >
+              <select name="hostelBlock" value={form.hostelBlock} onChange={handleChange} required>
                 <option value="">Select Hostel Block</option>
                 <option value="HB-1">HB-1</option>
                 <option value="HB-2">HB-2</option>
@@ -158,56 +160,27 @@ const StudentDashboard = () => {
 
             <div className="form-group">
               <label>Date of Journey:</label>
-              <input
-                type="date"
-                name="journeyDate"
-                value={form.journeyDate}
-                onChange={handleChange}
-                required
-              />
+              <input type="date" name="journeyDate" value={form.journeyDate} onChange={handleChange} required />
             </div>
 
             <div className="form-group">
               <label>Time of Leaving:</label>
-              <input
-                type="time"
-                name="leavingTime"
-                value={form.leavingTime}
-                onChange={handleChange}
-                required
-              />
+              <input type="time" name="leavingTime" value={form.leavingTime} onChange={handleChange} required />
             </div>
 
             <div className="form-group">
               <label>Luggage:</label>
-              <input
-                type="text"
-                name="luggageDetails"
-                value={form.luggageDetails}
-                onChange={handleChange}
-                required
-              />
+              <input type="text" name="luggageDetails" value={form.luggageDetails} onChange={handleChange} required />
             </div>
 
             <div className="form-group">
               <label>Destination:</label>
-              <input
-                type="text"
-                name="destination"
-                value={form.destination}
-                onChange={handleChange}
-                required
-              />
+              <input type="text" name="destination" value={form.destination} onChange={handleChange} required />
             </div>
 
             <div className="form-group">
               <label>Purpose:</label>
-              <textarea
-                name="reason"
-                value={form.reason}
-                onChange={handleChange}
-                required
-              />
+              <textarea name="reason" value={form.reason} onChange={handleChange} required />
             </div>
 
             <button type="submit" disabled={loading}>
@@ -222,8 +195,10 @@ const StudentDashboard = () => {
 
           {myRequests.length > 0 ? (
             <div className="requests-list">
+
               {myRequests.map((req) => (
                 <div key={req._id} className="request-card">
+
                   <div className="request-header">
                     <span>{formatDate(req.requestDate)}</span>
                     <span style={{ color: getStatusColor(req.status) }}>
@@ -240,12 +215,129 @@ const StudentDashboard = () => {
                     <p><strong>Luggage:</strong> {req.luggageDetails}</p>
                     <p><strong>Reason:</strong> {req.reason}</p>
                   </div>
+
+                  {/* NEW TRANSPORT DETAILS (Only after approval) */}
+                  {req.status === "approved" && (
+                    <div className="transport-section">
+                      <h4>Transport Details</h4>
+
+                      {/* EDIT MODE TOGGLE */}
+                      {!req._editMode ? (
+                        <button
+                          className="edit-btn"
+                          onClick={() =>
+                            setMyRequests(prev =>
+                              prev.map(p =>
+                                p._id === req._id ? { ...p, _editMode: true } : p
+                              )
+                            )
+                          }
+                        >
+                          Edit
+                        </button>
+                      ) : (
+                        <button
+                          className="save-btn"
+                          onClick={async () => {
+                            try {
+                              const res = await API.put(
+                                `/api/gatepass/student/update-transport/${req._id}`,
+                                {
+                                  cabNumber: req.cabNumber,
+                                  transportMode: req.transportMode,
+                                  ticketNumber: req.ticketNumber,
+                                }
+                              );
+
+                              alert("Transport details updated!");
+
+                              setMyRequests(prev =>
+                                prev.map(p =>
+                                  p._id === req._id
+                                    ? { ...res.data.gatePass, _editMode: false }
+                                    : p
+                                )
+                              );
+                            } catch (err) {
+                              alert("Failed to save transport");
+                            }
+                          }}
+                        >
+                          Save
+                        </button>
+                      )}
+
+                      <div className="form-group">
+                        <label>Cab Number:</label>
+                        <input
+                          type="text"
+                          value={req.cabNumber || ""}
+                          readOnly={!req._editMode}
+                          className={req._editMode ? "editable" : "readonly"}
+                          onChange={(e) =>
+                            setMyRequests(prev =>
+                              prev.map(p =>
+                                p._id === req._id
+                                  ? { ...p, cabNumber: e.target.value }
+                                  : p
+                              )
+                            )
+                          }
+                          placeholder="Enter Cab Number"
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label>Mode of Transport:</label>
+                        <input
+                          type="text"
+                          value={req.transportMode || ""}
+                          readOnly={!req._editMode}
+                          className={req._editMode ? "editable" : "readonly"}
+                          onChange={(e) =>
+                            setMyRequests(prev =>
+                              prev.map(p =>
+                                p._id === req._id
+                                  ? { ...p, transportMode: e.target.value }
+                                  : p
+                              )
+                            )
+                          }
+                          placeholder="Bus / Train / Auto / Cab"
+                        />
+                      </div>
+
+                      <div className="form-group">
+                        <label>Ticket Number:</label>
+                        <input
+                          type="text"
+                          value={req.ticketNumber || ""}
+                          readOnly={!req._editMode}
+                          className={req._editMode ? "editable" : "readonly"}
+                          onChange={(e) =>
+                            setMyRequests(prev =>
+                              prev.map(p =>
+                                p._id === req._id
+                                  ? { ...p, ticketNumber: e.target.value }
+                                  : p
+                              )
+                            )
+                          }
+                          placeholder="Enter Ticket Number"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+
                 </div>
               ))}
+
             </div>
           ) : (
             <p>No gate pass requests found.</p>
           )}
+
         </section>
       </div>
     </div>

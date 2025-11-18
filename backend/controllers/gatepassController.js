@@ -274,3 +274,83 @@ exports.getPublicGatePasses = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+/* ----------------------------------------------------
+   STUDENT: UPDATE TRANSPORT DETAILS AFTER APPROVAL
+---------------------------------------------------- */
+exports.updateTransportDetails = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { cabNumber, transportMode, ticketNumber } = req.body;
+
+    const gatePass = await GatePass.findById(id);
+
+    if (!gatePass) return res.status(404).json({ message: "Gate pass not found" });
+
+    // Student can only update their own pass
+    if (gatePass.studentId.toString() !== req.user.userId) {
+      return res.status(403).json({ message: "Not allowed" });
+    }
+
+    // Only after admin approves
+    if (gatePass.status !== "approved") {
+      return res.status(400).json({ message: "Transport details can be filled only after approval" });
+    }
+
+    const updated = await GatePass.findByIdAndUpdate(
+      id,
+      { cabNumber, transportMode, ticketNumber },
+      { new: true }
+    );
+
+    res.status(200).json({
+      message: "Transport details updated",
+      gatePass: updated
+    });
+
+  } catch (err) {
+    console.error("updateTransportDetails Error:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+/* ----------------------------------------------------
+   ADMIN: GET APPROVED PASSES SORTED BY LEAVING DATE
+---------------------------------------------------- */
+exports.getApprovedSortedByLeavingDate = async (req, res) => {
+  try {
+    const passes = await GatePass.find({ status: "approved" })
+      .populate("studentId", "name rollNumber")
+      .sort({ journeyDate: 1 }); // earliest leaving first
+
+    res.status(200).json(passes);
+
+  } catch (err) {
+    console.error("getApprovedSortedByLeavingDate Error:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+/* ----------------------------------------------------
+   GUARD: FINAL VERIFICATION CHECKBOX
+---------------------------------------------------- */
+exports.finalGuardVerify = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const updated = await GatePass.findByIdAndUpdate(
+      id,
+      { guardVerified: true },
+      { new: true }
+    );
+
+    if (!updated) return res.status(404).json({ message: "Gate pass not found" });
+
+    res.status(200).json({
+      message: "Gate pass verified by guard",
+      gatePass: updated
+    });
+
+  } catch (err) {
+    console.error("finalGuardVerify Error:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+

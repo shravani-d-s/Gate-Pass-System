@@ -8,61 +8,39 @@ const GatePassVerify = () => {
   const [approvedPasses, setApprovedPasses] = useState([]);
   const [selectedPass, setSelectedPass] = useState(null);
 
-  const [transport, setTransport] = useState({
-    cabNumber: "",
-    transportMode: "",
-    ticketNumber: "",
-  });
-
-  const [checked, setChecked] = useState({}); // checkbox tracking
-
-  // Load only APPROVED gatepasses
+  // Load APPROVED & SORTED passes
   useEffect(() => {
     const load = async () => {
-      const res = await API.get("/api/gatepass/approved");
-      setApprovedPasses(res.data);
-
-      // auto-check those already verified
-      const initialChecked = {};
-      res.data.forEach((p) => {
-        if (p.cabNumber || p.transportMode || p.ticketNumber) {
-          initialChecked[p._id] = true;
-        }
-      });
-      setChecked(initialChecked);
+      try {
+        const res = await API.get("/api/gatepass/approved/sorted");
+        setApprovedPasses(res.data.filter(p => !p.guardVerified)); // remove already verified
+      } catch (err) {
+        console.error("❌ Failed to load approved passes:", err);
+      }
     };
+
     load();
   }, []);
 
-  const openModal = (p) => {
-    setSelectedPass(p);
-    setTransport({
-      cabNumber: "",
-      transportMode: "",
-      ticketNumber: "",
-    });
-  };
-
+  const openModal = (p) => setSelectedPass(p);
   const closeModal = () => setSelectedPass(null);
 
-  const saveTransportDetails = async () => {
-    if (
-      !transport.cabNumber.trim() ||
-      !transport.transportMode.trim() ||
-      !transport.ticketNumber.trim()
-    ) {
-      alert("All transport details are required.");
-      return;
+  // 🟢 Guard/Admin final verification
+  const finalizeVerification = async (id) => {
+    try {
+      await API.put(`/api/gatepass/verify/final/${id}`);
+
+      // 1. Remove this pass from the left-side list
+      setApprovedPasses(prev => prev.filter(p => p._id !== id));
+
+      // 2. Close modal
+      setSelectedPass(null);
+
+      alert("Gate pass verified successfully!");
+    } catch (err) {
+      console.error("❌ Final verification failed:", err);
+      alert("Could not verify gate pass.");
     }
-
-    await API.post(`/api/gatepass/verify/${selectedPass._id}`, transport);
-
-    alert("Transport details saved!");
-
-    // automatically tick the checkbox
-    setChecked((prev) => ({ ...prev, [selectedPass._id]: true }));
-
-    closeModal();
   };
 
   return (
@@ -71,7 +49,7 @@ const GatePassVerify = () => {
       {/* BACK BUTTON + CARD WRAPPER */}
       <div className="verify-wrapper">
 
-        {/* BACK BUTTON LEFT SIDE */}
+        {/* BACK BUTTON */}
         <button
           className="verify-side-back-btn"
           onClick={() => navigate("/admin-dashboard")}
@@ -84,16 +62,18 @@ const GatePassVerify = () => {
           <h2>Verify Gate Pass</h2>
 
           {approvedPasses.length === 0 ? (
-            <p>No approved passes yet.</p>
+            <p>No approved passes pending for verification.</p>
           ) : (
             approvedPasses.map((pass) => (
               <div key={pass._id} className="verify-row">
+
+                {/* Checkbox for final guard verification */}
                 <input
                   type="checkbox"
-                  checked={checked[pass._id] || false}
-                  disabled={checked[pass._id] || false}
+                  onChange={() => finalizeVerification(pass._id)}
                 />
 
+                {/* Student Name */}
                 <p
                   className="verify-name"
                   onClick={() => openModal(pass)}
@@ -118,6 +98,7 @@ const GatePassVerify = () => {
 
             <h2>{selectedPass.studentId?.name}</h2>
 
+            {/* Personal & Pass Details */}
             <div className="modal-details">
               <p><strong>Hostel:</strong> {selectedPass.hostelBlock}</p>
               <p><strong>Journey Date:</strong> {selectedPass.journeyDate}</p>
@@ -129,44 +110,39 @@ const GatePassVerify = () => {
 
             <hr />
 
+            {/* Transport Details Filled by Student */}
             <h3>Transport Details</h3>
 
             <input
               className="modal-input"
               type="text"
+              value={selectedPass.cabNumber || ""}
+              readOnly
               placeholder="Cab Number"
-              value={transport.cabNumber}
-              onChange={(e) =>
-                setTransport({ ...transport, cabNumber: e.target.value })
-              }
-              required
             />
 
             <input
               className="modal-input"
               type="text"
+              value={selectedPass.transportMode || ""}
+              readOnly
               placeholder="Mode of Transport"
-              value={transport.transportMode}
-              onChange={(e) =>
-                setTransport({ ...transport, transportMode: e.target.value })
-              }
-              required
             />
 
             <input
               className="modal-input"
               type="text"
+              value={selectedPass.ticketNumber || ""}
+              readOnly
               placeholder="Ticket Number"
-              value={transport.ticketNumber}
-              onChange={(e) =>
-                setTransport({ ...transport, ticketNumber: e.target.value })
-              }
-              required
             />
 
             <div className="modal-buttons">
-              <button className="submit-btn" onClick={saveTransportDetails}>
-                Save Details
+              <button
+                className="submit-btn"
+                onClick={() => finalizeVerification(selectedPass._id)}
+              >
+                Verify Pass ✔
               </button>
             </div>
           </div>

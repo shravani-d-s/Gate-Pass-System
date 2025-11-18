@@ -12,7 +12,7 @@ const gatePassSchema = new mongoose.Schema(
     // BASIC DETAILS
     name: { type: String, required: true, trim: true },
     hostelBlock: { type: String, required: true },
-    journeyDate: { type: String, required: true },
+    journeyDate: { type: String, required: true },   // stays as string since FE sends dd-mm-yyyy
     leavingTime: { type: String, required: true },
     destination: { type: String, required: true },
 
@@ -31,10 +31,13 @@ const gatePassSchema = new mongoose.Schema(
     approvedDate: { type: Date },
     rejectionReason: { type: String, trim: true },
 
-    // GUARD VERIFICATION FIELDS
+    // STUDENT TRANSPORT DETAILS (visible only after approval)
     cabNumber: { type: String, default: "", trim: true },
     transportMode: { type: String, default: "", trim: true },
     ticketNumber: { type: String, default: "", trim: true },
+
+    // FINAL GUARD CHECK
+    guardVerified: { type: Boolean, default: false },
   },
   {
     timestamps: true,
